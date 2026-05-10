@@ -24,11 +24,19 @@ export default function AppLayout() {
             <NavLink to="/dashboard" className={linkClass}>
               Dashboard
             </NavLink>
+            <NavLink to="/trips" className={linkClass}>
+              My Trips
+            </NavLink>
+            <NavLink to="/cities" className={linkClass}>
+              City Search
+            </NavLink>
           </nav>
           <div className="flex items-center gap-3">
-            <span className="hidden text-sm text-slate-600 sm:inline">
-              Hi, <span className="font-medium text-slate-800">{user?.name}</span>
-            </span>
+            <NavLink to="/profile" className={linkClass}>
+              <span className="hidden text-sm sm:inline">
+                {user?.name || 'Profile'}
+              </span>
+            </NavLink>
             <button
               type="button"
               onClick={() => {

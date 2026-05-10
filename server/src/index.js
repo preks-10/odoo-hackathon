@@ -7,6 +7,8 @@ import stopsRoutes from './routes/stops.js';
 import activitiesRoutes from './routes/activities.js';
 import packingRoutes from './routes/packing.js';
 import shareRoutes from './routes/share.js';
+import notesRoutes from './routes/notes.js';
+import profileRoutes from './routes/profile.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -25,10 +27,12 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/trips', tripsRoutes);
+app.use('/api/trips/:tripId/notes', notesRoutes);
 app.use('/api/stops', stopsRoutes);
 app.use('/api/activities', activitiesRoutes);
 app.use('/api/packing', packingRoutes);
 app.use('/api/share', shareRoutes);
+app.use('/api/profile', profileRoutes);
 
 app.use((err, _req, res, _next) => {
   console.error(err);

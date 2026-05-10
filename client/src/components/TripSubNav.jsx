@@ -5,6 +5,7 @@ const tabs = [
   { to: 'view', label: 'Itinerary view' },
   { to: 'budget', label: 'Budget' },
   { to: 'packing', label: 'Packing' },
+  { to: 'notes', label: 'Notes' },
 ];
 
 export default function TripSubNav() {
