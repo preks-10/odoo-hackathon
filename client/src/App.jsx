@@ -5,12 +5,15 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import BudgetPage from './pages/BudgetPage.jsx';
 import CreateTrip from './pages/CreateTrip.jsx';
 import Dashboard from './pages/Dashboard.jsx';
+import ExplorePage from './pages/ExplorePage.jsx';
 import ItineraryBuilder from './pages/ItineraryBuilder.jsx';
 import ItineraryView from './pages/ItineraryView.jsx';
 import Login from './pages/Login.jsx';
 import PackingPage from './pages/PackingPage.jsx';
+import Profile from './pages/Profile.jsx';
 import Register from './pages/Register.jsx';
 import SharePage from './pages/SharePage.jsx';
+import AiPlan from './pages/AiPlan.jsx';
 
 function HomeRedirect() {
   const { isAuthenticated } = useAuth();
@@ -33,6 +36,9 @@ export default function App() {
         }
       >
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/plan-ai" element={<AiPlan />} />
+        <Route path="/explore/:type" element={<ExplorePage />} />
         <Route path="/trips/new" element={<CreateTrip />} />
         <Route path="/trips/:id/itinerary" element={<ItineraryBuilder />} />
         <Route path="/trips/:id/view" element={<ItineraryView />} />

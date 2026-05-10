@@ -121,23 +121,75 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">
-            Welcome back{user?.name ? `, ${user.name.split(' ')[0]}` : ''} ✈️
-          </h1>
-          <p className="mt-1 text-slate-500">
-            {trips.length === 0
-              ? 'You have no trips yet — start planning!'
-              : `${trips.length} trip${trips.length !== 1 ? 's' : ''} total`}
-          </p>
-        </div>
-        <Link
-          to="/trips/new"
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 py-3 font-bold text-slate-900 shadow hover:bg-amber-300"
-        >
-          + Plan New Trip
-        </Link>
+      <div className="mb-8 grid gap-6 xl:grid-cols-[1.4fr,0.9fr]">
+        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900">
+                Welcome back{user?.name ? `, ${user.name.split(' ')[0]}` : ''} ✨
+              </h1>
+              <p className="mt-2 max-w-2xl text-slate-500">
+                Your travel hub now includes a richer profile area, phone verification, and quick discovery tools for <Link to="/explore/events" className="text-primary hover:underline">events</Link>, <Link to="/explore/hotels" className="text-primary hover:underline">hotels</Link>, and <Link to="/explore/restaurants" className="text-primary hover:underline">restaurants</Link>.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 text-2xl font-bold text-amber-700">
+                {user?.name?.charAt(0)?.toUpperCase() || 'T'}
+              </span>
+              <div>
+                <p className="text-sm text-slate-500">Profile ready</p>
+                <Link
+                  to="/profile"
+                  className="mt-1 inline-flex rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow hover:bg-primary-dark"
+                >
+                  Edit profile
+                </Link>
+              </div>
+            </div>
+          </div>
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-sm uppercase tracking-wide text-slate-400">Trips</p>
+              <p className="mt-3 text-3xl font-bold text-slate-900">{trips.length}</p>
+            </div>
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-sm uppercase tracking-wide text-slate-400">Verified phone</p>
+              <p className="mt-3 text-3xl font-bold text-teal-700">{user?.phone || 'No phone'}</p>
+            </div>
+            <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-sm uppercase tracking-wide text-slate-400">Next step</p>
+              <Link to="/explore/events" className="mt-3 block text-3xl font-bold text-slate-900 hover:text-primary">
+                Explore more
+              </Link>
+            </div>
+          </div>
+        </section>
+        <section className="grid gap-4">
+          <Link
+            to="/plan-ai"
+            className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <p className="text-sm font-semibold uppercase tracking-wide text-teal-600">AI Planner</p>
+            <h2 className="mt-4 text-xl font-bold text-slate-900">Build trips in seconds</h2>
+            <p className="mt-2 text-sm text-slate-500">Tell the AI your mood and get a curated itinerary instantly.</p>
+          </Link>
+          <Link
+            to="/explore/events"
+            className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <p className="text-sm font-semibold uppercase tracking-wide text-amber-600">Events</p>
+            <h2 className="mt-4 text-xl font-bold text-slate-900">Find local experiences</h2>
+            <p className="mt-2 text-sm text-slate-500">Search festivals, exhibitions, and shows with category filters.</p>
+          </Link>
+          <Link
+            to="/explore/restaurants"
+            className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <p className="text-sm font-semibold uppercase tracking-wide text-slate-600">Restaurants</p>
+            <h2 className="mt-4 text-xl font-bold text-slate-900">Reserve the best tables</h2>
+            <p className="mt-2 text-sm text-slate-500">Browse top restaurants and nearby hotel stays.</p>
+          </Link>
+        </section>
       </div>
 
       {loading ? (

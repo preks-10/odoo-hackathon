@@ -10,6 +10,7 @@ export default function Register() {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -23,6 +24,8 @@ export default function Register() {
     if (!name.trim()) e.name = 'Name is required';
     if (!email.trim()) e.email = 'Email is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Enter a valid email';
+    if (!phone.trim()) e.phone = 'Phone number is required';
+    else if (!/^\d{10,}$/.test(phone.replace(/\D/g, ''))) e.phone = 'Enter at least 10 digits';
     if (!password) e.password = 'Password is required';
     else if (password.length < 6) e.password = 'Password must be at least 6 characters';
     setErrors(e);
@@ -34,7 +37,7 @@ export default function Register() {
     if (!validate()) return;
     setLoading(true);
     try {
-      await register({ name: name.trim(), email: email.trim(), password });
+      await register({ name: name.trim(), email: email.trim(), phone: phone.trim(), password });
       toast.success('Account created!');
       navigate('/dashboard', { replace: true });
     } catch (err) {
@@ -78,6 +81,21 @@ export default function Register() {
               className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-primary focus:border-primary focus:ring-2"
             />
             {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+          </div>
+          <div>
+            <label htmlFor="phone" className="mb-1 block text-sm font-medium text-slate-700">
+              Phone number
+            </label>
+            <input
+              id="phone"
+              type="tel"
+              autoComplete="tel"
+              placeholder="Enter at least 10 digits"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-primary focus:border-primary focus:ring-2"
+            />
+            {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
           </div>
           <div>
             <label htmlFor="password" className="mb-1 block text-sm font-medium text-slate-700">

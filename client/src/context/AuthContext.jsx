@@ -33,6 +33,13 @@ export function AuthProvider({ children }) {
     return data;
   }, [login]);
 
+  const updateProfile = useCallback(async (body) => {
+    const data = await api('/api/auth/me', { method: 'PATCH', body });
+    setUser(data);
+    localStorage.setItem('traveloop_user', JSON.stringify(data));
+    return data;
+  }, []);
+
   const value = useMemo(
     () => ({
       user,
@@ -42,8 +49,9 @@ export function AuthProvider({ children }) {
       logout,
       register,
       loginRequest,
+      updateProfile,
     }),
-    [user, token, login, logout, register, loginRequest],
+    [user, token, login, logout, register, loginRequest, updateProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

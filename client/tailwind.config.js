@@ -5,17 +5,26 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#0D9488',
-          dark: '#0f766e',
-          light: '#14b8a6',
+          DEFAULT: '#87CEEB', // Sky Blue (soft blue)
+          dark: '#4682B4', // Steel Blue
+          light: '#B0E0E6', // Powder Blue
         },
         accent: {
-          DEFAULT: '#F59E0B',
-          dark: '#d97706',
+          DEFAULT: '#98FB98', // Pale Green
+          dark: '#32CD32', // Lime Green
+        },
+        secondary: {
+          DEFAULT: '#DDA0DD', // Plum (soft purple)
+          light: '#E6E6FA', // Lavender
+        },
+        background: {
+          DEFAULT: '#FFFFFF', // White
+          light: '#F8F8FF', // Alice Blue
         },
       },
       fontFamily: {
-        sans: ['DM Sans', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Inter', 'serif'],
       },
     },
   },

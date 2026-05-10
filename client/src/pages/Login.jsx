@@ -1,98 +1,175 @@
-import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext.jsx';
-import Spinner from '../components/Spinner.jsx';
+
+const quotes = [
+  { text: 'The world is a book and those who do not travel read only one page.', author: 'Saint Augustine' },
+  { text: 'Travel is the only thing you buy that makes you richer.', author: 'Unknown' },
+  { text: 'To travel is to live.', author: 'Hans Christian Andersen' },
+  { text: 'Adventure awaits those who seek it.', author: 'Unknown' },
+  { text: 'Travel makes you realize how much you don’t know.', author: 'Unknown' },
+];
 
 export default function Login() {
-  const { loginRequest, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from?.pathname || '/dashboard';
-
+  const [quoteIdx, setQuoteIdx] = useState(0);
+  const [isLogin, setIsLogin] = useState(true);
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const { loginRequest, register } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (isAuthenticated) navigate(from, { replace: true });
-  }, [isAuthenticated, navigate, from]);
+    const timer = setInterval(() => {
+      setQuoteIdx((prev) => (prev + 1) % quotes.length);
+    }, 5000);
 
-  function validate() {
-    const e = {};
-    if (!email.trim()) e.email = 'Email is required';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Enter a valid email';
-    if (!password) e.password = 'Password is required';
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  }
+    return () => clearInterval(timer);
+  }, []);
 
-  async function handleSubmit(ev) {
-    ev.preventDefault();
-    if (!validate()) return;
+  const quote = quotes[quoteIdx];
+
+  async function handleSubmit(event) {
+    event.preventDefault();
     setLoading(true);
+
     try {
-      await loginRequest({ email: email.trim(), password });
-      toast.success('Welcome back!');
-      navigate(from, { replace: true });
-    } catch (err) {
-      toast.error(err.message || 'Login failed');
+      if (isLogin) {
+        await loginRequest({ email, password });
+        toast.success('Signed in successfully');
+      } else {
+        if (!name.trim()) {
+          toast.error('Please enter your name');
+          return;
+        }
+        await register({ name, email, password });
+        toast.success('Account created successfully');
+      }
+      navigate('/dashboard');
+    } catch (error) {
+      toast.error(error.message || 'Unable to sign in');
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-teal-50 via-white to-amber-50 px-4">
-      <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-xl">
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-primary">Traveloop</h1>
-          <p className="mt-1 text-slate-600">Sign in to plan your next adventure</p>
+    <div className="flex h-screen w-full bg-neutral-900 text-white font-sans">
+
+      {/* LEFT SIDE */}
+      <div className="hidden lg:flex flex-col w-1/2 relative overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=2070&auto=format&fit=crop"
+          alt="Travel"
+          className="absolute inset-0 w-full h-full object-cover opacity-70"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+
+        <div className="relative z-10 flex flex-col justify-end h-full p-16">
+          <h1 className="text-4xl font-bold mb-4">Traveloop</h1>
+
+          <div className="h-24">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={quoteIdx}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.6 }}
+              >
+                <p className="text-2xl italic text-neutral-200">
+                  "{quote.text}"
+                </p>
+                <p className="text-sm text-neutral-400 mt-2">
+                  — {quote.author}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-          <div>
-            <label htmlFor="email" className="mb-1 block text-sm font-medium text-slate-700">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-primary focus:border-primary focus:ring-2"
-            />
-            {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
-          </div>
-          <div>
-            <label htmlFor="password" className="mb-1 block text-sm font-medium text-slate-700">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none ring-primary focus:border-primary focus:ring-2"
-            />
-            {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
-          </div>
+      </div>
+
+      {/* RIGHT SIDE */}
+      <div className="flex w-full lg:w-1/2 items-center justify-center p-8 lg:p-24 relative">
+
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-blue-600 rounded-full blur-[120px] opacity-20" />
+        <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-purple-600 rounded-full blur-[120px] opacity-20" />
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="relative z-10 w-full max-w-md backdrop-blur-2xl bg-white/5 border border-white/10 p-10 rounded-3xl"
+        >
+
+          <h2 className="text-3xl font-bold mb-2">
+            {isLogin ? 'Welcome back' : 'Start your journey'}
+          </h2>
+
+          <p className="text-neutral-400 mb-8">
+            {isLogin
+              ? 'Sign in to continue planning your trips.'
+              : 'Create an account to get started.'}
+          </p>
+
+          <form className="space-y-5" onSubmit={handleSubmit}>
+            {!isLogin && (
+              <div>
+                <label className="text-sm text-neutral-300">Name</label>
+                <input
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  type="text"
+                  placeholder="John Doe"
+                  className="w-full mt-1 bg-black/30 border border-white/10 rounded-xl px-4 py-3"
+                />
+              </div>
+            )}
+
+            <div>
+              <label className="text-sm text-neutral-300">Email</label>
+              <input
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                type="email"
+                placeholder="you@example.com"
+                className="w-full mt-1 bg-black/30 border border-white/10 rounded-xl px-4 py-3"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm text-neutral-300">Password</label>
+              <input
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                type="password"
+                placeholder="••••••••"
+                className="w-full mt-1 bg-black/30 border border-white/10 rounded-xl px-4 py-3"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-white text-black font-semibold py-3 rounded-xl hover:bg-neutral-200 transition disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {loading ? 'Working…' : isLogin ? 'Sign In' : 'Sign Up'}
+            </button>
+          </form>
+
           <button
-            type="submit"
-            disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary py-2.5 font-semibold text-white shadow hover:bg-primary-dark disabled:opacity-60"
+            type="button"
+            onClick={() => setIsLogin((prev) => !prev)}
+            className="mt-6 text-sm text-neutral-400 hover:text-white w-full text-center"
           >
-            {loading ? <Spinner className="py-0" /> : 'Sign in'}
+            {isLogin
+              ? "Don't have an account? Sign up"
+              : "Already have an account? Sign in"}
           </button>
-        </form>
-        <p className="mt-6 text-center text-sm text-slate-600">
-          No account?{' '}
-          <Link to="/register" className="font-semibold text-primary hover:underline">
-            Create one
-          </Link>
-        </p>
+
+        </motion.div>
       </div>
     </div>
   );
