@@ -1,17 +1,17 @@
 -- Traveloop PostgreSQL schema (run once against your database)
 -- Example: psql $DATABASE_URL -f schema.sql
 
+-- Users
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
-  phone VARCHAR(20),
-  phone_verified BOOLEAN NOT NULL DEFAULT FALSE,
-  avatar_url TEXT,
   password_hash VARCHAR(255) NOT NULL,
+  avatar_url TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Trips
 CREATE TABLE IF NOT EXISTS trips (
   id SERIAL PRIMARY KEY,
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -19,56 +19,41 @@ CREATE TABLE IF NOT EXISTS trips (
   description TEXT,
   start_date DATE,
   end_date DATE,
-  is_public BOOLEAN NOT NULL DEFAULT FALSE,
-  share_token VARCHAR(64) UNIQUE,
+  cover_image_url TEXT,
   total_budget NUMERIC(12, 2),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_trips_user_id ON trips(user_id);
-
+-- Stops (Cities/Destinations in a Trip)
 CREATE TABLE IF NOT EXISTS stops (
   id SERIAL PRIMARY KEY,
   trip_id INTEGER NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
   city_name VARCHAR(255) NOT NULL,
-  country VARCHAR(255),
+  position INTEGER NOT NULL DEFAULT 0, -- For drag-and-drop reordering
   arrival_date DATE,
-  departure_date DATE,
-  position INTEGER NOT NULL DEFAULT 0,
-  notes TEXT
+  departure_date DATE
 );
-
 CREATE INDEX IF NOT EXISTS idx_stops_trip_id ON stops(trip_id);
 
+-- Activities (Things to do in a Stop)
 CREATE TABLE IF NOT EXISTS activities (
   id SERIAL PRIMARY KEY,
   stop_id INTEGER NOT NULL REFERENCES stops(id) ON DELETE CASCADE,
   name VARCHAR(255) NOT NULL,
   category VARCHAR(100) NOT NULL DEFAULT 'other',
   estimated_cost NUMERIC(12, 2) DEFAULT 0,
-  duration_minutes INTEGER,
-  description TEXT,
-  scheduled_time TIME
+  position INTEGER NOT NULL DEFAULT 0, -- For drag-and-drop reordering
+  scheduled_time TIMESTAMPTZ
 );
-
 CREATE INDEX IF NOT EXISTS idx_activities_stop_id ON activities(stop_id);
 
-CREATE TABLE IF NOT EXISTS packing_items (
+-- Expenses (For Budget Intelligence)
+CREATE TABLE IF NOT EXISTS expenses (
   id SERIAL PRIMARY KEY,
   trip_id INTEGER NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
-  name VARCHAR(255) NOT NULL,
-  category VARCHAR(100) DEFAULT 'general',
-  is_packed BOOLEAN NOT NULL DEFAULT FALSE
+  category VARCHAR(100) NOT NULL,
+  amount NUMERIC(12, 2) NOT NULL,
+  description TEXT,
+  date DATE DEFAULT CURRENT_DATE
 );
-
-CREATE INDEX IF NOT EXISTS idx_packing_trip_id ON packing_items(trip_id);
-
-CREATE TABLE IF NOT EXISTS trip_notes (
-  id SERIAL PRIMARY KEY,
-  trip_id INTEGER NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
-  stop_id INTEGER REFERENCES stops(id) ON DELETE SET NULL,
-  content TEXT NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS idx_trip_notes_trip_id ON trip_notes(trip_id);
+CREATE INDEX IF NOT EXISTS idx_expenses_trip_id ON expenses(trip_id);
